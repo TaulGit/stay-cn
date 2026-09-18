@@ -1,0 +1,1904 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#050505" />
+  <title>Stay? · 中文完整剧情</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050505;
+      --ink: #e9e9e9;
+      --muted: #8d8d8d;
+      --line: #252525;
+      --accent: #d5b47a;
+      --accent-soft: rgba(213, 180, 122, 0.14);
+      --panel: rgba(18, 18, 18, 0.97);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      background: var(--bg);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      overflow-x: hidden;
+      font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+      color: var(--ink);
+    }
+
+    button {
+      border: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .game-shell {
+      position: relative;
+      width: min(100vw, 900px);
+      min-height: 100vh;
+      padding: 24px clamp(18px, 5vw, 54px) 30px;
+      display: flex;
+      flex-direction: column;
+      isolation: isolate;
+    }
+
+    .game-shell::before {
+      content: "";
+      position: fixed;
+      inset: 50% auto auto 50%;
+      width: min(74vw, 620px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255, 255, 255, 0.035);
+      border-radius: 50%;
+      box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.012),
+                  0 0 0 52px rgba(255, 255, 255, 0.008);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 32px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .chapter {
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .controls {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .control {
+      padding: 3px 0;
+      color: var(--muted);
+      background: transparent;
+      font: inherit;
+      letter-spacing: 0.08em;
+      transition: color 160ms ease;
+    }
+
+    .control:hover,
+    .control:focus-visible {
+      color: var(--ink);
+      outline: none;
+    }
+
+    .screen {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 46px 0 70px;
+    }
+
+    .view {
+      width: min(100%, 690px);
+      animation: appear 500ms cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .view[hidden] { display: none; }
+
+    .wake-view {
+      display: grid;
+      place-items: center;
+      gap: 26px;
+      text-align: center;
+    }
+
+    .wake-mark {
+      position: relative;
+      width: 88px;
+      aspect-ratio: 1;
+      border: 1px solid rgba(213, 180, 122, 0.44);
+      border-radius: 50%;
+      transform: rotate(-12deg);
+      opacity: 0.82;
+    }
+
+    .wake-mark::before,
+    .wake-mark::after {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border: 1px dashed rgba(213, 180, 122, 0.34);
+      border-radius: 50%;
+    }
+
+    .wake-mark::after {
+      inset: 42px 10px;
+      border: 0;
+      border-top: 1px solid var(--accent);
+      transform: rotate(90deg);
+    }
+
+    .wake-button {
+      min-width: 184px;
+      padding: 18px 28px 17px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: clamp(24px, 4vw, 30px);
+      letter-spacing: 0.18em;
+      text-indent: 0.18em;
+      transition: border-color 180ms ease, background 180ms ease,
+                  color 180ms ease, transform 180ms ease;
+    }
+
+    .wake-button:hover,
+    .wake-button:focus-visible {
+      border-color: rgba(213, 180, 122, 0.68);
+      background: var(--accent-soft);
+      color: #fff7e7;
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .wake-hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+
+    .scene-view {
+      display: grid;
+      gap: 24px;
+    }
+
+    .scene-kicker {
+      margin: 0;
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+    }
+
+    .scene-title {
+      margin: -6px 0 0;
+      color: #f0f0f0;
+      font-size: clamp(24px, 4vw, 31px);
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    .scene-title[hidden],
+    .scene-kicker[hidden] { display: none; }
+
+    .story-copy {
+      display: grid;
+      gap: 20px;
+      color: #d6d6d6;
+      font-size: clamp(17px, 2.4vw, 20px);
+      line-height: 1.95;
+    }
+
+    .story-copy p { margin: 0; }
+
+    .story-copy .detail {
+      color: #a7a7a7;
+      font-size: 0.92em;
+    }
+
+    .story-copy .quote {
+      padding-left: 16px;
+      border-left: 1px solid rgba(213, 180, 122, 0.45);
+      color: #e4e4e4;
+    }
+
+    .story-copy .choice-record {
+      margin: -5px 0;
+    }
+
+    .choices {
+      display: grid;
+      gap: 10px;
+      padding-top: 4px;
+    }
+
+    .choice {
+      position: relative;
+      width: 100%;
+      padding: 14px 18px 13px 28px;
+      background: transparent;
+      border: 1px solid rgba(233, 233, 233, 0.22);
+      color: #e2e2e2;
+      font-size: 16px;
+      line-height: 1.5;
+      text-align: left;
+      transition: color 160ms ease, border-color 160ms ease,
+                  background 160ms ease, padding-left 160ms ease;
+    }
+
+    .choice::before {
+      content: "›";
+      position: absolute;
+      left: 11px;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .choice:hover,
+    .choice:focus-visible {
+      padding-left: 32px;
+      border-color: rgba(213, 180, 122, 0.72);
+      background: rgba(255, 255, 255, 0.025);
+      color: #fff;
+      outline: none;
+    }
+
+    .choice:hover::before,
+    .choice:focus-visible::before {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .choice.selected {
+      border-color: rgba(213, 180, 122, 0.62);
+      border-left: 2px solid var(--accent);
+      background: rgba(255, 255, 255, 0.025);
+      color: #fff;
+    }
+
+    .choice.selected::before { display: none; }
+
+    .choice[disabled] {
+      cursor: default;
+      opacity: 0.52;
+    }
+
+    .choice-record {
+      position: relative;
+      margin: -6px 0;
+      padding-left: 16px;
+      border-left: 2px solid var(--accent);
+      color: #b7b7b7;
+      font-size: 0.92em;
+      font-style: italic;
+    }
+
+    .route-card {
+      display: grid;
+      gap: 6px;
+      margin: -4px 0 2px;
+      padding: 13px 15px;
+      border: 1px solid rgba(213, 180, 122, 0.24);
+      background: rgba(213, 180, 122, 0.05);
+    }
+
+    .route-card strong {
+      color: #f1dfbd;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+    }
+
+    .route-card span {
+      color: #a9a9a9;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .status {
+      min-height: 18px;
+      margin: 0;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    .clue-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.76);
+    }
+
+    .clue-panel[hidden] { display: none; }
+
+    .clue-card {
+      width: min(100%, 580px);
+      max-height: min(82vh, 720px);
+      overflow: auto;
+      padding: 24px clamp(20px, 4vw, 34px) 28px;
+      border: 1px solid rgba(213, 180, 122, 0.38);
+      background: var(--panel);
+      box-shadow: 0 22px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    .clue-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .clue-head h2 {
+      margin: 0;
+      color: #f1dfbd;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .clue-close {
+      padding: 2px 0;
+      background: transparent;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+
+    .clue-close:hover,
+    .clue-close:focus-visible { color: var(--ink); outline: none; }
+
+    .clue-meta {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .clue-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .clue-item {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: #b9b9b9;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .clue-item::before {
+      content: "○";
+      color: #555;
+    }
+
+    .clue-item.known { color: #eee; }
+    .clue-item.known::before { content: "●"; color: var(--accent); }
+
+    .clue-foot {
+      margin: 20px 0 0;
+      color: #8f8f8f;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(9px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 520px) {
+      .game-shell { padding-top: 18px; }
+      .controls { gap: 10px; }
+      .screen { padding-top: 30px; }
+      .scene-view { gap: 21px; }
+      .story-copy { line-height: 1.82; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell" aria-label="Stay? 中文完整剧情">
+    <header class="topbar">
+      <span class="chapter" id="chapterLabel">INK</span>
+      <nav class="controls" aria-label="游戏控制">
+        <button class="control" id="saveButton" type="button">保存</button>
+        <button class="control" id="loadButton" type="button">读取</button>
+        <button class="control" id="clueButton" type="button">线索</button>
+        <button class="control" id="restartButton" type="button">重来</button>
+      </nav>
+    </header>
+
+    <section class="screen" aria-live="polite">
+      <section class="view wake-view" id="wakeView" aria-labelledby="wakeTitle">
+        <div class="wake-mark" aria-hidden="true"></div>
+        <button class="wake-button" id="wakeButton" type="button" aria-describedby="wakeHint">
+          <span id="wakeTitle">醒来</span>
+        </button>
+        <p class="wake-hint" id="wakeHint">每一轮都会从这里开始。</p>
+      </section>
+
+      <section class="view scene-view" id="sceneView" hidden aria-labelledby="sceneTitle">
+        <p class="scene-kicker" id="sceneKicker" hidden></p>
+        <h1 class="scene-title" id="sceneTitle" hidden></h1>
+        <div class="story-copy" id="storyCopy"></div>
+        <div class="choices" id="choices" role="group" aria-label="选择"></div>
+      </section>
+    </section>
+
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <aside class="clue-panel" id="cluePanel" hidden aria-labelledby="clueTitle">
+    <div class="clue-card" role="dialog" aria-modal="true">
+      <div class="clue-head">
+        <h2 id="clueTitle">已知线索</h2>
+        <button class="clue-close" id="clueClose" type="button">关闭</button>
+      </div>
+      <p class="clue-meta" id="clueMeta"></p>
+      <ul class="clue-list" id="clueList"></ul>
+      <p class="clue-foot">知识会随循环保留；人物关系和当轮行动只影响当前人生。</p>
+    </div>
+  </aside>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = 'stay-complete-cn-v1';
+      const wakeView = document.getElementById('wakeView');
+      const sceneView = document.getElementById('sceneView');
+      const wakeButton = document.getElementById('wakeButton');
+      const wakeTitle = document.getElementById('wakeTitle');
+      const wakeHint = document.getElementById('wakeHint');
+      const chapterLabel = document.getElementById('chapterLabel');
+      const sceneKicker = document.getElementById('sceneKicker');
+      const sceneTitle = document.getElementById('sceneTitle');
+      const storyCopy = document.getElementById('storyCopy');
+      const choices = document.getElementById('choices');
+      const status = document.getElementById('status');
+      const cluePanel = document.getElementById('cluePanel');
+      const clueMeta = document.getElementById('clueMeta');
+      const clueList = document.getElementById('clueList');
+
+      const openingParagraph = '晨光斜斜地从你二楼宿舍的窗户照进来，照亮了你成摞的书、祖母的被子，还有室友那头凌乱的卷发。室友静静地躺在床上，睁着眼睛盯着天花板，仿佛那里藏着一个秘密，正等着被说出来。';
+      const tracks = [
+        {
+          id: 'magic',
+          label: '“我喜欢魔法，可我不知道自己能不能应付那些必修的学术课程……”',
+          name: '魔法',
+          summary: '学习遗物、咒语与意志，进入彭特先生的魔法店。',
+        },
+        {
+          id: 'combat',
+          label: '“我可不想整天困在图书馆或档案室里。谁在乎那些东西？给我一把剑、一匹马，再给我一个职位。”',
+          name: '战斗',
+          summary: '接受训练并驻守菲奥雷水坝，调查湖底遗址。',
+        },
+        {
+          id: 'history',
+          label: '“我想弄清我们从哪里来、是怎样走到今天的，也想知道该如何从过去吸取教训。我要选历史方向。”',
+          name: '历史',
+          summary: '在档案馆研究凤凰宝石和治愈南方的遗物。',
+        },
+      ];
+
+      const reactionChoices = [
+        { id: 'okay', label: '“呃，好吧。”' },
+        { id: 'bud', label: '“老兄，你的羞涩都去哪儿了？没人告诉我，你一直把一个满嘴讥讽的混蛋藏在里面。”' },
+      ];
+      const dayChoice = { id: 'school', label: '为今天做好准备，去学校。' };
+      const appearanceChoices = [
+        { id: 'lad', label: '一个矮个男孩' },
+        { id: 'woman', label: '一个瘦长的年轻女人' },
+        { id: 'freckles', label: '一个满脸雀斑的人' },
+      ];
+      const trackPrompt = '“嗯。”岑说，语气干涩如盐。“真令人震惊。”';
+      const smockParagraph = '岑套上一件你很确定来自她脏衣篮的罩衫，走出了房间。';
+
+      const clueCatalog = [
+        ['loopStone', '乔给过你一件能把人带回这一天的遗物。'],
+        ['comet', '彗星会毁灭世界，但存在阻止它的方法。'],
+        ['phoenixClue', '凤凰宝石藏在城门石狮的头中。'],
+        ['lionInscription', '石狮下方刻着古语。'],
+        ['protectWord', '真正要使用的古语是“保护”，不是“毁灭”。'],
+        ['verisWater', '菲奥雷水下有一只怪物，黑暗魔力正在污染水系。'],
+        ['verisName', '怪物名叫维丽丝，她曾经许愿保护自己的城市。'],
+        ['suzetteDanger', '苏泽特可能在舞会上释放危险的黑暗魔法。'],
+        ['southernClue', '南方土地正在枯萎，歉收会把人们推向战争。'],
+      ];
+
+      const routeCards = {
+        magic: { name: '魔法路线', summary: '遗物、古语、许愿魔法与维丽丝的名字。' },
+        combat: { name: '战斗路线', summary: '菲奥雷水坝、奥萨妮、幽灵传说与石狮古语。' },
+        history: { name: '历史路线', summary: '档案馆、凤凰宝石与治愈土地的遗物。' },
+      };
+
+      const state = createInitialState();
+
+      function createInitialState() {
+        return {
+          scene: 'wake',
+          loop: 0,
+          track: null,
+          reaction: null,
+          day: null,
+          appearance: null,
+          returnScene: null,
+          transcript: [],
+          knowledge: [],
+          detail: null,
+          flags: {
+            joTrust: false,
+            mykaLab: false,
+            mykaRelation: null,
+            estebanArt: false,
+            suzetteFiles: false,
+            suzetteCalm: false,
+            ancientTongue: false,
+            protectWord: false,
+            verisName: false,
+            verisWish: false,
+            southernClue: false,
+            damBlown: false,
+            gem: false,
+            healingRelic: false,
+            verisRest: false,
+            southHealed: false,
+            cometProtected: false,
+          },
+        };
+      }
+
+      function textOf(item) {
+        return typeof item === 'string' ? item : item.text;
+      }
+
+      function normalize(value) {
+        return String(value || '')
+          .replace(/[“”"‘’'\s。，、！？!?：:；;…·]/g, '')
+          .toLowerCase();
+      }
+
+      function addKnowledge(id) {
+        if (!state.knowledge.includes(id)) state.knowledge.push(id);
+      }
+
+      function setDetail(scene, text) {
+        state.detail = { scene, text };
+      }
+
+      function sceneDetail(scene) {
+        return state.detail && state.detail.scene === scene ? [{ text: state.detail.text, className: 'detail' }] : [];
+      }
+
+      function makeChoice(id, label, next, action, extra = {}) {
+        return { id, label, next, action, ...extra };
+      }
+
+      function trackChoices() {
+        const list = tracks.map((track) => makeChoice(
+          `track-${track.id}`,
+          track.label,
+          'track_reaction',
+          () => { state.track = track.id; },
+        ));
+        list.push(makeChoice(
+          'campus',
+          '不回想，直接出门，去行政楼前的空地看看。',
+          'campus',
+          () => { state.returnScene = state.scene; },
+        ));
+        if (state.knowledge.length) {
+          list.push(makeChoice(
+            'remember',
+            '回想我已经知道的事。',
+            'memory',
+            () => { state.returnScene = state.scene; },
+          ));
+        }
+        return list;
+      }
+
+      function routeHubChoices(route) {
+        const list = [];
+        if (route === 'magic') {
+          list.push(
+            makeChoice('pent', '去彭特先生的魔法店工作。', 'magic_pent'),
+            makeChoice('myka', '去迈卡的实验室看看。', 'magic_myka'),
+            makeChoice('suzette', '和苏泽特谈谈她的研究。', 'magic_suzette'),
+            makeChoice('dance', '参加市长举办的舞会。', 'dance'),
+          );
+        }
+        if (route === 'combat') {
+          list.push(
+            makeChoice('ossani', '去找水坝守卫奥萨妮。', 'combat_ossani'),
+            makeChoice('night', '夜里去调查水坝。', 'combat_night'),
+            makeChoice('warehouse', '调查储存炸药的仓库。', 'combat_warehouse'),
+            makeChoice('warMyka', '去迈卡的研究帐篷帮忙。', 'combat_myka'),
+          );
+        }
+        if (route === 'history') {
+          list.push(
+            makeChoice('archive', '在档案馆研究遗物和古代文献。', 'history_archive'),
+            makeChoice('graduation', '查看毕业日的安排。', 'history_graduation'),
+            makeChoice('relic', '调查档案馆后室的治愈遗物。', 'history_relic'),
+            makeChoice('esteban', '和埃斯特班聊聊他想画的东西。', 'history_esteban'),
+          );
+        }
+        list.push(
+          makeChoice('room', '去苏泽特的房间绕一下。', 'room_intro', () => { state.returnScene = `${route}_hub`; }),
+          makeChoice('campus', '回到校园空地，看看其他同学。', 'campus', () => { state.returnScene = `${route}_hub`; }),
+          makeChoice('memory', '回想这一轮已经掌握的线索。', 'memory', () => { state.returnScene = `${route}_hub`; }),
+          makeChoice('finish', '结束这一轮，看看世界会怎样。', 'loop_end'),
+        );
+        return list;
+      }
+
+      const scenes = {
+        story: () => ({
+          kicker: '埃莱亚大学 · 第一天',
+          title: '宿舍清晨',
+          paragraphs: [openingParagraph],
+          choices: [
+            makeChoice('speak', '“嘿，你还好吗，岑？”', 'continuation_speak'),
+            makeChoice('leave', '让她静静待着。', 'continuation_leave'),
+          ],
+        }),
+
+        continuation_speak: () => ({
+          kicker: '宿舍 · 早晨',
+          paragraphs: [
+            '岑转过来看你，脸上勉强挤出一点笑意。“大日子。”',
+            '“……嗯？”',
+            '岑撑起身子坐起来，把两条瘦削的腿晃下床，皱着眉看着它们。“天哪，我真瘦。”站起身时，岑瞥了你一眼。“你决定好要选哪个方向了吗？今天就是决定的日子。”',
+          ],
+          choices: trackChoices(),
+        }),
+
+        continuation_leave: () => ({
+          kicker: '宿舍 · 早晨',
+          paragraphs: [
+            '听见你起身，岑撑起身子坐起来，把两条瘦削的腿晃下床，皱着眉看着它们。“天哪，我真瘦。”站起身时，岑瞥了你一眼。“你决定好要选哪个方向了吗？今天就是决定的日子。”',
+          ],
+          choices: trackChoices(),
+        }),
+
+        track_reaction: (s) => ({
+          kicker: '专业选择 · 岑的回应',
+          title: '今天就是决定的日子',
+          paragraphs: [trackPrompt],
+          choices: reactionChoices.map((choice) => makeChoice(
+            `reaction-${choice.id}`,
+            choice.label,
+            'track_day',
+            () => { state.reaction = choice.id; },
+          )),
+        }),
+
+        track_day: (s) => ({
+          kicker: '宿舍 · 出门前',
+          title: '准备去学校',
+          paragraphs: [smockParagraph],
+          choices: [makeChoice('school', dayChoice.label, 'track_mirror', () => { state.day = dayChoice.id; })],
+        }),
+
+        track_mirror: (s) => ({
+          kicker: '宿舍 · 镜子前',
+          title: '你看见自己',
+          paragraphs: [
+            '你为今天做准备时，在镜子里瞥见了自己。',
+            '你看见',
+          ],
+          choices: appearanceChoices.map((choice) => makeChoice(
+            `appearance-${choice.id}`,
+            choice.label,
+            (state) => `${state.track}_hub`,
+            () => { state.appearance = choice.id; },
+          )),
+        }),
+
+        campus: (s) => ({
+          kicker: '行政楼前的空地',
+          title: '在专业咨询之前',
+          paragraphs: [
+            '行政楼前挤满了准备选择方向的学生。你可以主动接近某个人，也可以独自读完手里的小说。',
+            '迈卡在谈泡泡和魔法实验；乔被高年级学生嘲笑；埃斯特班像是在练习飞刀；苏泽特抱着一摞学习计划。',
+          ],
+          choices: [
+            makeChoice('myka', '接近迈卡，聊聊泡泡、实验和天文学。', 'campus_myka'),
+            makeChoice('jo', '接近乔，看看发生了什么。', 'campus_jo'),
+            makeChoice('esteban', '接近埃斯特班。', 'campus_esteban'),
+            makeChoice('suzette', '接近苏泽特。', 'campus_suzette'),
+            makeChoice('none', '不接近任何人，独自读小说。', 'campus_return', () => {
+              setDetail('campus_return', '你把小说翻到折角处，暂时把空地上的喧闹留在身后。');
+            }),
+            makeChoice('consult', '回到刚才的专业咨询。', (state) => state.returnScene || 'continuation_speak'),
+          ],
+        }),
+
+        campus_myka: () => ({
+          kicker: '行政楼前 · 迈卡',
+          paragraphs: [
+            '迈卡一边吹泡泡一边谈论魔法实验。她想知道声音、音素和遗物为什么能互相影响，也对被淹没的菲奥雷充满好奇。',
+          ],
+          choices: [
+            makeChoice('lab', '接受她的邀请，去实验室看看。', 'campus_myka_lab', () => { state.flags.mykaLab = true; }),
+            makeChoice('chat', '只把这当作一次普通的聊天。', 'campus_return', () => {
+              setDetail('campus_return', '迈卡把一个泡泡吹到你面前，泡泡破掉时，她又回到自己的实验记录里。');
+            }),
+          ],
+        }),
+
+        campus_myka_lab: () => ({
+          kicker: '迈卡的实验室',
+          paragraphs: [
+            '实验室里堆着药剂、气泡和记录遗物反应的纸片。迈卡把这次访问交给你决定它是什么。',
+          ],
+          choices: [
+            makeChoice('friend', '把它当作朋友见面。', 'campus_return', () => {
+              state.flags.mykaRelation = 'friend';
+              setDetail('campus_return', '你们把实验室的椅子拖到窗边，约好下次继续讨论音素。');
+            }),
+            makeChoice('date', '接受她的暧昧暗示，把它当成约会。', 'campus_return', () => {
+              state.flags.mykaRelation = 'date';
+              setDetail('campus_return', '迈卡把一瓶会发光的泡泡剂塞进你手里，笑着说下次见。');
+            }),
+            makeChoice('refuse', '礼貌拒绝，保持普通同学关系。', 'campus_return', () => {
+              state.flags.mykaRelation = 'ordinary';
+              setDetail('campus_return', '你们仍然交换了研究笔记，但把关系停在同学的位置。');
+            }),
+          ],
+        }),
+
+        campus_jo: () => ({
+          kicker: '行政楼前 · 乔',
+          paragraphs: [
+            '你看到乔被高年级学生嘲笑。乔低着头，像是已经习惯把自己的声音藏起来。',
+          ],
+          choices: [
+            makeChoice('sharp', '用尖刻的话反击。', 'campus_return', () => {
+              state.flags.joTrust = true;
+              setDetail('campus_return', '你用几句锋利的话让对方闭嘴。乔没有道谢，只在离开时轻轻碰了碰你的袖口。');
+            }),
+            makeChoice('threat', '直接以战斗经验威慑对方。', 'campus_return', () => {
+              state.flags.joTrust = true;
+              setDetail('campus_return', '你把手按在武器的位置，告诉他们再靠近一步就会后悔。乔终于抬头看你。');
+            }),
+            makeChoice('leave', '不与他们纠缠，拉着乔离开。', 'campus_return', () => {
+              state.flags.joTrust = true;
+              setDetail('campus_return', '你拉着乔绕过人群。她一路没有说话，但走得比刚才快了一点。');
+            }),
+          ],
+        }),
+
+        campus_esteban: () => ({
+          kicker: '行政楼前 · 埃斯特班',
+          paragraphs: [
+            '埃斯特班出身军人家庭，手里却握着飞刀练习册和一张画纸。他被默认要继承父辈的道路，真正想做的却是画画。',
+          ],
+          choices: [
+            makeChoice('knives', '和他一起练习飞刀。', 'campus_return', () => {
+              setDetail('campus_return', '飞刀钉在靶心旁边。埃斯特班笑了一下，又把画纸压回书本下面。');
+            }),
+            makeChoice('painting', '追问他是否真的喜欢绘画。', 'campus_return', () => {
+              state.flags.estebanArt = true;
+              setDetail('campus_return', '他承认自己想画白色谷仓后的黄昏，并请你不要把这件事告诉家里。');
+            }),
+            makeChoice('leave', '先不打扰他。', 'campus_return', () => {
+              setDetail('campus_return', '你留给他一块安静的地方，他把画纸重新拿了出来。');
+            }),
+          ],
+        }),
+
+        campus_suzette: () => ({
+          kicker: '行政楼前 · 苏泽特',
+          paragraphs: [
+            '苏泽特谈起学习计划、学术协会和改变世界的愿望。她说得很快，像是只要停下来，母亲的声音就会追上来。',
+          ],
+          choices: [
+            makeChoice('plan', '询问她的学习计划。', 'campus_return', () => {
+              setDetail('campus_return', '苏泽特把一页页计划摊开给你看，里面写满了失传魔法和实用咒语。');
+            }),
+            makeChoice('association', '聊聊学术协会。', 'campus_return', () => {
+              setDetail('campus_return', '她说协会能让古代实用魔法重新回到人们手中。');
+            }),
+            makeChoice('world', '问她怎样才能真正改变世界。', 'campus_return', () => {
+              setDetail('campus_return', '苏泽特握紧资料，回答说：“总得有人先试一次。”');
+            }),
+          ],
+        }),
+
+        campus_return: (s) => ({
+          kicker: '行政楼前的空地',
+          paragraphs: [
+            '人群仍在往专业咨询处移动。你把刚才的谈话记在心里。',
+            ...sceneDetail('campus_return'),
+          ],
+          choices: [
+            makeChoice('again', '继续在空地转一圈。', 'campus'),
+            makeChoice('consult', '回到刚才的专业咨询。', (state) => state.returnScene || 'continuation_speak'),
+          ],
+        }),
+
+        memory: (s) => ({
+          kicker: '循环记忆',
+          title: `第 ${s.loop + 1} 轮 · 你知道什么`,
+          paragraphs: [
+            '每一轮人生结束时，其他人会忘记，而你把记忆带回宿舍。线索不会替你做选择，只会让下一次观察更准确。',
+            ...clueCatalog.filter(([id]) => s.knowledge.includes(id)).map(([, text]) => ({ text, className: 'detail' })),
+            s.knowledge.length ? '还有一些答案藏在尚未走过的路线里。' : '你还没有带回任何线索。',
+          ],
+          choices: [
+            makeChoice('back', '回到刚才的路线。', (state) => state.returnScene || (state.track ? `${state.track}_hub` : 'continuation_speak')),
+          ],
+        }),
+
+        magic_hub: (s) => ({
+          kicker: `魔法路线 · 第 ${s.loop + 1} 轮`,
+          title: '遗物、咒语与意志',
+          paragraphs: [
+            '你选择了魔法方向。课堂讨论遗物、咒语、意志三者如何结合；毕业后，你在彭特先生的魔法店工作。',
+            '这一条线会把你带到古语、失传咒语、迈卡的实验室和维丽丝的传说。',
+            { text: '路线提示：学会古语和安息许愿魔法的方法，是处理维丽丝的关键。', className: 'detail' },
+          ],
+          choices: routeHubChoices('magic'),
+        }),
+
+        magic_pent: () => ({
+          kicker: '彭特先生的魔法店',
+          title: '问一问古代魔法',
+          paragraphs: [
+            '你制作药剂、处理遗物、招待顾客，也逐渐和彭特先生熟悉起来。柜台后的书页泛黄，许多更强的古代咒语已经失传。',
+            ...sceneDetail('magic_pent'),
+          ],
+          choices: [
+            makeChoice('ancient', '询问古语。', 'magic_pent', () => {
+              addKnowledge('lionInscription');
+              setDetail('magic_pent', '彭特先生说，更强的古代咒语已经失传，但声音仍然是引导遗物的钥匙。');
+            }),
+            makeChoice('relicStone', '询问刀柄上的石头是否也是遗物。', 'magic_pent', () => {
+              setDetail('magic_pent', '彭特先生解释：遗物本身不等于法术，力量还必须经过语言和意志的引导。');
+            }),
+            makeChoice('protect', '询问“保护”一词。', 'magic_pent', () => {
+              addKnowledge('protectWord');
+              state.flags.protectWord = true;
+              setDetail('magic_pent', '他说，“保护”不是把危险抹掉，而是让被保护的东西继续存在。这个词很难直接掌握。');
+            }),
+            makeChoice('pronunciation', '请求学习古语音读。', 'magic_pent', () => {
+              state.flags.ancientTongue = true;
+              addKnowledge('lionInscription');
+              setDetail('magic_pent', '彭特先生纠正你的发音。你终于能把古语从纸面读出，而不是只看懂它的形状。');
+            }),
+            makeChoice('rest', '询问如何让失控的许愿魔法师安息。', 'magic_pent', () => {
+              state.flags.ancientTongue = true;
+              state.flags.verisName = true;
+              state.flags.verisWish = true;
+              addKnowledge('verisWater');
+              addKnowledge('verisName');
+              setDetail('magic_pent', '彭特先生提到菲奥雷水下的维丽丝：她曾许愿保护自己的城市。要让她安息，必须知道她的姓名、愿望，并用古语说出完整的驱逐意思。');
+            }),
+            makeChoice('daily', '不继续追问，回去处理日常工作。', 'magic_pent', () => {
+              setDetail('magic_pent', '你把药剂瓶一一归位。答案没有消失，只是还没有被你问出来。');
+            }),
+            makeChoice('back', '回到魔法路线总览。', 'magic_hub'),
+          ],
+        }),
+
+        magic_myka: () => ({
+          kicker: '迈卡的实验室',
+          title: '声音如何驱动遗物',
+          paragraphs: [
+            '迈卡用泡泡、药剂、遗物和天文学实验研究魔法效果。她想知道，为什么一个音素能让沉默的物件产生回应。',
+            ...sceneDetail('magic_myka'),
+          ],
+          choices: [
+            makeChoice('visit', '接受邀请，参观她的实验室。', 'magic_myka', () => {
+              state.flags.mykaLab = true;
+              setDetail('magic_myka', '你们把一枚小遗物放进泡泡里。声音改变时，泡泡的颜色也跟着改变。');
+            }),
+            makeChoice('friend', '把这次访问当作朋友见面。', 'magic_myka', () => {
+              state.flags.mykaRelation = 'friend';
+              setDetail('magic_myka', '迈卡收起实验记录，和你聊起菲奥雷沉没前的传说。');
+            }),
+            makeChoice('date', '接受她的暧昧暗示，把它当成约会。', 'magic_myka', () => {
+              state.flags.mykaRelation = 'date';
+              setDetail('magic_myka', '她把一支泡泡管递给你，笑着说这次实验可以晚一点再做。');
+            }),
+            makeChoice('refuse', '拒绝访问，保持普通同学关系。', 'magic_myka', () => {
+              state.flags.mykaRelation = 'ordinary';
+              setDetail('magic_myka', '你留下几页研究笔记，转身回到魔法店。');
+            }),
+            makeChoice('back', '回到魔法路线总览。', 'magic_hub'),
+          ],
+        }),
+
+        magic_suzette: () => ({
+          kicker: '魔法店 · 苏泽特',
+          title: '愿望与压力',
+          paragraphs: [
+            '苏泽特想让失传的实用魔法重新回到人们手中。她的母亲却把她的人生当成学术声誉的一部分。',
+            ...sceneDetail('magic_suzette'),
+          ],
+          choices: [
+            makeChoice('encourage', '鼓励她，相信她能改变世界。', 'magic_suzette', () => {
+              state.flags.suzetteCalm = true;
+              setDetail('magic_suzette', '苏泽特终于放慢语速，说她只是想让魔法真正帮助普通人。');
+            }),
+            makeChoice('mother', '追问她母亲为什么干涉她的人生。', 'magic_suzette', () => {
+              setDetail('magic_suzette', '她说母亲总把“保护”说成控制，仿佛只有一种正确的未来。');
+            }),
+            makeChoice('comfort', '安慰她，帮她缓解压力。', 'magic_suzette', () => {
+              state.flags.suzetteCalm = true;
+              setDetail('magic_suzette', '她把资料抱在胸前，承认自己害怕证明不了任何事。');
+            }),
+            makeChoice('indifferent', '对她的研究不置可否。', 'magic_suzette', () => {
+              setDetail('magic_suzette', '苏泽特点点头，把那摞资料收回箱子里。');
+            }),
+            makeChoice('back', '回到魔法路线总览。', 'magic_hub'),
+          ],
+        }),
+
+        dance: (s) => ({
+          kicker: '市长的舞会',
+          title: '大厅里的暗红色阴影',
+          paragraphs: [
+            '舞会表面上是宴会和社交，实际上却是战争消息与苏泽特支线交汇的地方。你可以在大厅里移动，也可以观察谁正在失控。',
+            s.flags.suzetteFiles
+              ? { text: '你已经处理过苏泽特的许愿魔法资料，黑暗咒语暂时没有完整的材料。', className: 'detail' }
+              : { text: '如果不处理那些资料，黑色藤蔓和红色花朵可能会吞没舞会。', className: 'detail' },
+            ...sceneDetail('dance'),
+          ],
+          choices: [
+            makeChoice('buffet', '去自助餐区吃东西。', 'dance', () => {
+              setDetail('dance', '你在银盘之间找到一块冷掉的面包，听见大厅另一头传来低声争吵。');
+            }),
+            makeChoice('soldier', '关注突然闯入的南方士兵。', 'dance', () => {
+              addKnowledge('southernClue');
+              setDetail('dance', '士兵带来的不是祝酒词，而是南方歉收和边境紧张的消息。');
+            }),
+            makeChoice('jo', '跟乔去听取局势。', 'dance', () => {
+              setDetail('dance', '乔把声音压得很低：南方的水和土地都在死去，战争只是迟早的事。');
+            }),
+            makeChoice('myka', '想办法把战争消息告诉迈卡。', 'dance', () => {
+              setDetail('dance', '迈卡把消息写进实验记录，开始思考水源污染是否会改变遗物反应。');
+            }),
+            makeChoice('suzette', '先陪伴情绪低落的苏泽特。', 'dance', () => {
+              state.flags.suzetteCalm = true;
+              setDetail('dance', '苏泽特在花园里深呼吸，暗红色的光在她指尖一闪就熄灭。');
+            }),
+            makeChoice('observe', '继续留在大厅观察。', 'dance', () => {
+              setDetail('dance', '你看见苏泽特的箱子在角落里轻轻震动，像有藤蔓正在里面醒来。');
+            }),
+            ...(s.flags.suzetteFiles ? [] : [makeChoice('release', '让苏泽特释放尚未处理的许愿魔法。', 'ending_suzette')]),
+            makeChoice('back', '离开舞会，回到魔法路线总览。', 'magic_hub'),
+          ],
+        }),
+
+        combat_hub: (s) => ({
+          kicker: `战斗路线 · 第 ${s.loop + 1} 轮`,
+          title: '菲奥雷水坝驻地',
+          paragraphs: [
+            '你接受战斗训练，毕业后被派往菲奥雷水坝。这里的水面平静得不自然，守卫奥萨妮知道许多没人愿意写进报告的故事。',
+            { text: '路线提示：水坝不是单纯的防御工事；调查湖底，才能看见菲奥雷和维丽丝留下的痕迹。', className: 'detail' },
+          ],
+          choices: routeHubChoices('combat'),
+        }),
+
+        combat_ossani: () => ({
+          kicker: '菲奥雷水坝 · 奥萨妮',
+          title: '驻地日常与幽灵传说',
+          paragraphs: [
+            '奥萨妮是水坝驻地的守卫。她会带你看轮班表、站岗的位置，也会在夜深时讲起被投入水中的女人。',
+            ...sceneDetail('combat_ossani'),
+          ],
+          choices: [
+            makeChoice('tour', '让奥萨妮带你参观驻地。', 'combat_ossani', () => {
+              setDetail('combat_ossani', '她指着水坝的闸门说，这里建成的原因从来不只是抵御敌人。');
+            }),
+            makeChoice('chat', '和她聊站岗、轮班和生活。', 'combat_ossani', () => {
+              setDetail('combat_ossani', '奥萨妮说自己已经习惯听见水下的声音，只是从来不把它写进值班记录。');
+            }),
+            makeChoice('cards', '邀请她打牌，顺便问她是否擅长诈牌。', 'combat_ossani', () => {
+              setDetail('combat_ossani', '奥萨妮把牌摊开，笑着说：“你要是真想知道，就先学会看我的手。”');
+            }),
+            makeChoice('ghost', '继续追问“水坝闹鬼”的传说。', 'combat_ossani', () => {
+              addKnowledge('verisWater');
+              setDetail('combat_ossani', '两座城市原本是姐妹城市。古代魔法师用盐水把一座城市和怪物一起压在湖底。');
+            }),
+            makeChoice('folklore', '把故事说成纯粹的民间传说。', 'combat_ossani', () => {
+              setDetail('combat_ossani', '奥萨妮耸耸肩，说民间传说有时比报告更接近事实。');
+            }),
+            makeChoice('changeCards', '放弃幽灵话题，改成邀请奥萨妮打牌。', 'combat_ossani', () => {
+              setDetail('combat_ossani', '奥萨妮把牌洗好，问你要不要先学会辨认一个人的愿望。');
+            }),
+            makeChoice('sleep', '放弃幽灵话题，回去睡觉。', 'combat_ossani', () => {
+              setDetail('combat_ossani', '你把传说留在水声里，回到床上。');
+            }),
+            makeChoice('back', '回到战斗路线总览。', 'combat_hub'),
+          ],
+        }),
+
+        combat_night: () => ({
+          kicker: '水坝 · 深夜',
+          title: '夜探闸门',
+          paragraphs: [
+            '夜色压在水坝上。你可以回床睡觉，也可以沿着堤岸走，想象水下那座被淹没的菲奥雷。',
+            ...sceneDetail('combat_night'),
+          ],
+          choices: [
+            makeChoice('bed', '回床睡觉。', 'combat_night', () => {
+              setDetail('combat_night', '你闭上眼，闸门深处的水声仍然没有停。');
+            }),
+            makeChoice('dam', '走上水坝观察湖面。', 'combat_night', () => {
+              addKnowledge('verisWater');
+              setDetail('combat_night', '湖面映出一座不属于天空的城市轮廓，下一秒又被黑水抹平。');
+            }),
+            makeChoice('underwater', '想象水下的菲奥雷。', 'combat_night', () => {
+              setDetail('combat_night', '你想象腐烂的树干、死鱼和沉在水底的石狮。');
+            }),
+            makeChoice('warehouse', '调查储存炸药的仓库。', 'combat_warehouse'),
+            makeChoice('back', '回到战斗路线总览。', 'combat_hub'),
+          ],
+        }),
+
+        combat_warehouse: () => ({
+          kicker: '水坝仓库',
+          title: '封存的炸药',
+          paragraphs: [
+            '仓库的防护法术很强，但它们的作用不是抵御外敌，而是把里面的东西封在其中。几捆炸药靠墙堆着。',
+            ...sceneDetail('combat_warehouse'),
+          ],
+          choices: [
+            makeChoice('steal', '偷走几捆炸药。', 'combat_warehouse', () => {
+              setDetail('combat_warehouse', '你把炸药藏进防水布，钥匙在掌心里冷得像一块冰。');
+            }),
+            makeChoice('return', '放回炸药并锁门。', 'combat_hub', () => {
+              setDetail('combat_hub', '你把仓库恢复原样，水坝仍然沉默。');
+            }),
+            makeChoice('remote', '设置炸药并远程点火。', 'combat_flood', () => {
+              state.flags.damBlown = true;
+              addKnowledge('verisWater');
+            }),
+            makeChoice('noIgnite', '不引爆，重新放回。', 'combat_hub', () => {
+              setDetail('combat_hub', '你把点火装置拆下，决定先把看到的东西记住。');
+            }),
+            makeChoice('back', '离开仓库。', 'combat_hub'),
+          ],
+        }),
+
+        combat_flood: () => ({
+          kicker: '水坝崩塌',
+          title: '洪水冲向下游',
+          paragraphs: [
+            '远处传来闷响，水坝裂开。洪水冲向下游，死鱼和黑色藻类一起翻上来。你知道这会造成严重的现实灾难，但湖底的菲奥雷终于露了出来。',
+          ],
+          choices: [
+            makeChoice('fish', '处理搁浅的鱼。', 'combat_fiore', () => {
+              setDetail('combat_fiore', '你把搁浅的鱼推回浅水里，沿着泥泞的河床继续向前。');
+            }),
+            makeChoice('cross', '跨过鱼群，继续前进。', 'combat_fiore', () => {
+              setDetail('combat_fiore', '你跨过黑水和死鱼，看见水下城市的石墙。');
+            }),
+            makeChoice('retreat', '回到驻地。', 'ending_dam'),
+          ],
+        }),
+
+        combat_fiore: (s) => ({
+          kicker: '菲奥雷遗址',
+          title: '湖底的石狮',
+          paragraphs: [
+            '腐烂的树干、藻类、死鱼和古城废墟一起沉在湖底。倒下的石狮头部露出一道刻痕，像是在等待有人读出它。',
+            s.flags.ancientTongue
+              ? { text: '你已经学会古语音读，刻痕里的词逐渐有了声音。', className: 'detail' }
+              : { text: '刻痕对你来说仍然只是无法发音的符号。', className: 'detail' },
+            ...sceneDetail('combat_fiore'),
+          ],
+          choices: [
+            ...(s.flags.ancientTongue ? [makeChoice('read', '在石狮下面读出“保护”的古语。', 'combat_fiore', () => {
+              state.flags.protectWord = true;
+              addKnowledge('protectWord');
+              addKnowledge('lionInscription');
+              setDetail('combat_fiore', '古语在水下回响。它的意思不是毁灭，而是保护。');
+            })] : []),
+            makeChoice('listen', '贴近水面，听听遗址的声音。', 'combat_fiore', () => {
+              addKnowledge('verisWater');
+              setDetail('combat_fiore', '黑水深处传来一个名字的回声，但你还听不清它。');
+            }),
+            makeChoice('back', '离开遗址，回到战斗路线总览。', 'combat_hub'),
+          ],
+        }),
+
+        combat_myka: () => ({
+          kicker: '战争研究帐篷 · 迈卡',
+          title: '把实验带到前线',
+          paragraphs: [
+            '迈卡把你拉进研究帐篷。她试图用声音、泡泡和遗物反应帮助己方获胜，也想弄清黑水为何会改变魔法。',
+            ...sceneDetail('combat_myka'),
+          ],
+          choices: [
+            makeChoice('assist', '帮她记录实验。', 'combat_myka', () => {
+              state.flags.mykaLab = true;
+              setDetail('combat_myka', '实验记录指向同一个结论：污染正在沿着水系向南移动。');
+              addKnowledge('southernClue');
+            }),
+            makeChoice('question', '询问菲奥雷和古代魔法。', 'combat_myka', () => {
+              addKnowledge('verisWater');
+              setDetail('combat_myka', '迈卡说，菲奥雷可能不是被摧毁，而是被某种“保护”封在水下。');
+            }),
+            makeChoice('back', '回到战斗路线总览。', 'combat_hub'),
+          ],
+        }),
+
+        history_hub: (s) => ({
+          kicker: `历史路线 · 第 ${s.loop + 1} 轮`,
+          title: '档案馆里的旧世界',
+          paragraphs: [
+            '你选择历史方向，毕业后进入埃莱亚档案馆。乔研究遗物，苏泽特研究古代咒语，埃斯特班则常常把画纸藏在军用文件后面。',
+            { text: '路线提示：凤凰宝石、城门石狮和治愈南方的遗物，都要在档案馆里找到。', className: 'detail' },
+          ],
+          choices: routeHubChoices('history'),
+        }),
+
+        history_archive: () => ({
+          kicker: '埃莱亚档案馆',
+          title: '和乔、苏泽特一起查资料',
+          paragraphs: [
+            '档案馆保存着古代战斗留下的文献碎片、遗物和失传魔法记录。每一页都在提醒你：保存一件东西，有时也会把别的东西压在下面。',
+            ...sceneDetail('history_archive'),
+          ],
+          choices: [
+            makeChoice('jo', '询问乔关于遗物的看法。', 'history_archive', () => {
+              addKnowledge('phoenixClue');
+              setDetail('history_archive', '乔说，城门石狮的头部藏着一件城市守护遗物，但她说完就把话题带开了。');
+            }),
+            makeChoice('suzette', '询问苏泽特的论文和许愿魔法。', 'history_archive', () => {
+              addKnowledge('suzetteDanger');
+              setDetail('history_archive', '苏泽特的论文写着：愿望必须有姓名、语言和责任，否则力量会反过来吞噬施法者。');
+            }),
+            makeChoice('mother', '追问她母亲对她的影响。', 'history_archive', () => {
+              setDetail('history_archive', '苏泽特说，母亲要求她把所有未知都变成可控制的结论。');
+            }),
+            makeChoice('help', '帮苏泽特学习。', 'history_archive', () => {
+              state.flags.suzetteCalm = true;
+              setDetail('history_archive', '你陪她整理古代语法，她第一次承认自己其实害怕失败。');
+            }),
+            makeChoice('daily', '只做档案馆的日常工作。', 'history_archive', () => {
+              setDetail('history_archive', '你把碎片归档、给遗物编号，时间在纸页之间安静地过去。');
+            }),
+            makeChoice('back', '回到历史路线总览。', 'history_hub'),
+          ],
+        }),
+
+        history_esteban: () => ({
+          kicker: '码头与画纸 · 埃斯特班',
+          title: '军人家庭里的画家',
+          paragraphs: [
+            '埃斯特班出生于军人家庭，却想画白色谷仓后方、黄昏时分的农场色彩。你们可以一起喝酒，也可以在毕业时逃掉仪式去码头抽烟。',
+            ...sceneDetail('history_esteban'),
+          ],
+          choices: [
+            makeChoice('drink', '和他外出喝酒，给他的画起名字。', 'history_esteban', () => {
+              state.flags.estebanArt = true;
+              setDetail('history_esteban', '你们把那幅画叫作《不必继承的黄昏》。埃斯特班笑得像终于有了自己的名字。');
+            }),
+            makeChoice('ask', '问他想在哪里生活。', 'history_esteban', () => {
+              state.flags.estebanArt = true;
+              setDetail('history_esteban', '他说，只要能继续画画，哪里都可以是家。');
+            }),
+            makeChoice('support', '鼓励他在军旅人生中保留自己的东西。', 'history_esteban', () => {
+              state.flags.estebanArt = true;
+              setDetail('history_esteban', '他把画纸折好收进胸袋，说会在下一次守城时带上它。');
+            }),
+            makeChoice('back', '回到历史路线总览。', 'history_hub'),
+          ],
+        }),
+
+        history_graduation: () => ({
+          kicker: '历史路线 · 毕业日',
+          title: '石狮与毕业游行',
+          paragraphs: [
+            '毕业游行会让城门前挤满人。你知道城门石狮的头里藏着彩虹色的凤凰宝石，问题只是你愿不愿意错过典礼。',
+            ...sceneDetail('history_graduation'),
+          ],
+          choices: [
+            makeChoice('ceremony', '参加毕业典礼。', 'history_hub', () => {
+              setDetail('history_hub', '你按时走完典礼，档案馆的工作仍在等你。');
+            }),
+            makeChoice('smash', '跳过典礼，敲碎城门石狮取凤凰宝石。', 'history_after_gem', () => {
+              state.flags.gem = true;
+              addKnowledge('phoenixClue');
+              addKnowledge('lionInscription');
+            }),
+          ],
+        }),
+
+        history_after_gem: () => ({
+          kicker: '城门后方 · 凤凰宝石',
+          title: '避开毕业游行',
+          paragraphs: [
+            '你绕到花店后方的墙上，等游行队伍通过。街道空下来后，你敲碎石狮的头，从里面取出一颗彩虹色的凤凰宝石。',
+            '宝石没有灼伤你的手。它只是安静地发光，像一直在等待一个正确的词。',
+          ],
+          choices: [
+            makeChoice('relic', '回档案馆后室，调查用于治愈土地的遗物。', 'history_relic'),
+            makeChoice('return', '先回档案馆，之后再决定。', 'history_hub'),
+          ],
+        }),
+
+        history_relic: () => ({
+          kicker: '档案馆后室',
+          title: '偷走治愈土地的遗物',
+          paragraphs: [
+            '后室里放着一件能把力量送进干渴土地的遗物。你知道，拿走它意味着无法再回到原本的人生。',
+            ...sceneDetail('history_relic'),
+          ],
+          choices: [
+            makeChoice('steal', '偷走遗物。', 'history_relic', () => {
+              state.flags.healingRelic = true;
+              setDetail('history_relic', '遗物在你手里轻轻发热。它像一块被太阳晒过的玻璃，等待被放进泥土。');
+            }),
+            makeChoice('money', '离开时给借来的马车留下钱。', 'history_hub', () => {
+              state.flags.healingRelic = true;
+              setDetail('history_hub', '你在马车座位下留下钱，也把遗物藏进外衣。');
+            }),
+            makeChoice('noMoney', '不留下钱，直接离开。', 'history_hub', () => {
+              state.flags.healingRelic = true;
+              setDetail('history_hub', '你带走遗物，身后只剩一扇没有重新锁好的门。');
+            }),
+            makeChoice('back', '放弃偷窃，回到历史路线总览。', 'history_hub'),
+          ],
+        }),
+
+        room_intro: () => ({
+          kicker: '走廊 · 苏泽特的房间',
+          title: '要不要绕路？',
+          paragraphs: [
+            '选完专业后，你在走廊停下来。苏泽特的房间就在前面，门垫下面可能压着一把备用钥匙。',
+          ],
+          choices: [
+            makeChoice('go', '去苏泽特的房间。', 'room_inside'),
+            makeChoice('no', '不绕路，直接开始专业学习。', (state) => state.returnScene || `${state.track || 'magic'}_hub`),
+          ],
+        }),
+
+        room_inside: () => ({
+          kicker: '苏泽特的房间',
+          title: '黄色钩织毯与失传资料',
+          paragraphs: [
+            '你从门垫下找到钥匙。房间很整洁，床上铺着黄色钩织毯，墙边堆着成箱的资料。你翻找不同箱子，终于找到与失传许愿魔法有关的参考文献。',
+            '这些资料能帮助苏泽特重新拼出危险的许愿咒。你可以把它们带到码头，也可以什么都不做。',
+          ],
+          choices: [
+            makeChoice('burn', '把资料带到码头烧掉。', (state) => state.returnScene || `${state.track || 'magic'}_hub`, () => {
+              state.flags.suzetteFiles = true;
+              addKnowledge('suzetteDanger');
+            }),
+            makeChoice('leave', '不处理资料，离开房间。', (state) => state.returnScene || `${state.track || 'magic'}_hub`),
+          ],
+        }),
+
+        loop_end: (s) => {
+          addKnowledge('loopStone');
+          addKnowledge('comet');
+          return {
+          kicker: `一轮人生的末尾 · 第 ${s.loop + 1} 轮`,
+          title: '你把什么带回下一次清晨？',
+          paragraphs: s.loop === 0
+            ? [
+              '第一轮人生像普通人生一样向前：你读完大学、开始工作，也结识了同学和朋友。几年后，南方爆发战争，埃莱亚陷入危机，天空中出现一颗正朝城市撞来的彗星。',
+              '末日当天，乔把你带到一座高塔。她拿出彩虹色的凤凰宝石，说自己已经无数次阻止过彗星，却始终无法解决战争和南方土地枯萎的问题。',
+              '乔施法后，凤凰宝石耗尽，变成一块黑色残骸；一块发光的小石头在她手里生成。她把石头交给你，只说自己已经累了，希望你能做得比她更好。',
+              { text: '“小心苏泽特。”', className: 'quote' },
+              '白光之后，你回到大学第一天。乔完全不记得刚才发生的一切，只有你记得。',
+              { text: `已带回的线索：${s.knowledge.length} / ${clueCatalog.length}。`, className: 'detail' },
+            ]
+            : [
+              '这一轮的人生暂时走到尽头。你记得南方的黑水、石狮里的宝石、乔没有说完的话，以及苏泽特箱子里没有被理解的愿望。',
+              { text: `已带回的线索：${s.knowledge.length} / ${clueCatalog.length}。`, className: 'detail' },
+            ],
+          choices: [
+            makeChoice('newLoop', '回到宿舍，保留线索，开始下一轮。', null, null, { special: 'newLoop' }),
+            ...(s.loop >= 1 ? [makeChoice('south', '收拾行李，离开埃莱亚，向南走。', 'south_start')] : []),
+            makeChoice('war', '什么都不改变，等南方的战争和彗星到来。', 'ending_war'),
+            makeChoice('unchanged', '直接迎接彗星。', 'ending_unchanged'),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+          };
+        },
+
+        guide: (s) => ({
+          kicker: '推荐流程',
+          title: '把保护拆成几个具体的行动',
+          paragraphs: [
+            '完整路线需要多轮人生。先在魔法路线向彭特先生学习古语和安息许愿魔法的方法，再在战斗路线调查水坝并读出“保护”；之后去南方查污染，最后在历史路线取得凤凰宝石和治愈遗物。',
+            '当前状态：' + [
+              ['古语', s.flags.ancientTongue],
+              ['维丽丝姓名与愿望', s.flags.verisName && s.flags.verisWish],
+              ['南方线索', s.flags.southernClue],
+              ['凤凰宝石', s.flags.gem],
+              ['治愈遗物', s.flags.healingRelic],
+              ['维丽丝安息', s.flags.verisRest],
+            ].map(([name, ok]) => `${name}${ok ? '✓' : '○'}`).join(' · '),
+            '推荐顺序：学习 → 调查水坝 → 南方 → 历史路线取宝石与遗物 → 维丽丝 → 治愈南方 → 回埃莱亚 → 说出“保护” → 放下循环石。',
+          ],
+          choices: [
+            makeChoice('continue', '回到这一轮的末尾。', 'loop_end'),
+            makeChoice('newLoop', '回到宿舍，继续积累线索。', null, null, { special: 'newLoop' }),
+          ],
+        }),
+
+        south_start: () => ({
+          kicker: '离开埃莱亚',
+          title: '朝山里和南方走',
+          paragraphs: [
+            '你收拾行李，离开城市。徒步几天后，山路上出现铁匠、修枝人和卖炸糕的人。他们都提醒你前面的路很远。',
+          ],
+          choices: [
+            makeChoice('continue', '继续向南，不回头。', 'south_village'),
+            makeChoice('return', '回到埃莱亚。', 'loop_end'),
+          ],
+        }),
+
+        south_village: () => ({
+          kicker: '南方山路',
+          title: '不要回头',
+          paragraphs: [
+            '你穿过山村，继续向南。空气里有铁屑、树皮和炸糕的甜味，越往前走，土地的颜色越暗。',
+          ],
+          choices: [
+            makeChoice('continue', '继续走向更南边的农场。', 'south_moretti'),
+            makeChoice('return', '回头，放弃这次调查。', 'ending_south_only'),
+          ],
+        }),
+
+        south_moretti: () => ({
+          kicker: '南方山路 · 莫雷蒂',
+          title: '带着孙女的车夫',
+          paragraphs: [
+            '你遇到带着孙女西耶娜的小车夫莫雷蒂。他愿意把你带到农场，但你也可以拒绝帮助，独自走完剩下的路。',
+          ],
+          choices: [
+            makeChoice('accept', '接受莫雷蒂的帮助。', 'south_farm', () => {
+              setDetail('south_farm', '西耶娜把一只小橙子塞给你，橙皮上沾着洗不掉的黑色污迹。');
+            }),
+            makeChoice('refuse', '拒绝车，自己继续走。', 'south_farm', () => {
+              setDetail('south_farm', '你背着行李走到农场，鞋底全是黑泥。');
+            }),
+          ],
+        }),
+
+        south_farm: () => ({
+          kicker: '南方农场',
+          title: '黑色污染从哪里来？',
+          paragraphs: [
+            '农场里的果树大面积不结果。切开橙子会流出黑色黏液，鸡蛋壳上沾满黑色污迹，水源也正在变坏。莫雷蒂说，整个流域十年来都在衰亡。',
+            ...sceneDetail('south_farm'),
+          ],
+          choices: [
+            makeChoice('trees', '检查枯萎的果树。', 'south_farm', () => {
+              state.flags.southernClue = true;
+              addKnowledge('southernClue');
+              setDetail('south_farm', '树根没有被虫蛀，黑色黏液却沿着地下水脉向北延伸。');
+            }),
+            makeChoice('orange', '切开一个橙子。', 'south_farm', () => {
+              state.flags.southernClue = true;
+              addKnowledge('southernClue');
+              setDetail('south_farm', '橙子内部不是果肉，而是一团带着腥味的黑色黏液。');
+            }),
+            makeChoice('eggs', '检查鸡蛋和水源。', 'south_farm', () => {
+              state.flags.southernClue = true;
+              addKnowledge('southernClue');
+              setDetail('south_farm', '鸡蛋壳上的黑斑和井水里的沉渣来自同一个方向。');
+            }),
+            makeChoice('continue', '把线索连起来，继续调查污染。', 'south_clue'),
+          ],
+        }),
+
+        south_clue: (s) => ({
+          kicker: '南方水系',
+          title: '歉收、战争与湖底的黑暗',
+          paragraphs: [
+            '你把农场看到的黑色污染和菲奥雷湖底的怪物联系起来。维丽丝的黑色魔力沿着水系流动，南方的政变与战争并不是单纯的政治冲突。',
+            { text: '要让土地恢复，必须先面对污染的源头；要面对源头，必须叫出她的名字。', className: 'detail' },
+          ],
+          choices: [
+            ...(s.flags.verisName && s.flags.verisWish
+              ? [makeChoice('veris', '前往菲奥雷水域，呼唤“维丽丝”。', 'veris_encounter')]
+              : [makeChoice('learn', '记住线索，回到循环继续学习她的姓名与愿望。', 'loop_end')]),
+            makeChoice('stay', '先留在南方，接受这里只能暂时维持的生活。', 'ending_south_only'),
+          ],
+        }),
+
+        veris_encounter: () => ({
+          kicker: '菲奥雷水域',
+          title: '维丽丝从黑水中升起',
+          paragraphs: [
+            '你在水边呼唤维丽丝。藤蔓、红色火焰和黑色黏液从湖底升起，组成一个巨大的怪物形态。她曾经想保护自己的城市，如今只剩愿望还在重复。',
+            ...sceneDetail('veris_encounter'),
+          ],
+          choices: [
+            makeChoice('run', '逃跑或躲避。', 'ending_unchanged'),
+            makeChoice('throat', '清嗓，准备说出完整的古语。', (state) => state.flags.ancientTongue && state.flags.verisName && state.flags.verisWish ? 'veris_rest' : 'veris_failed'),
+            makeChoice('fight', '直接与她战斗。', 'ending_dam'),
+          ],
+        }),
+
+        veris_failed: () => ({
+          kicker: '菲奥雷水域',
+          title: '名字还不够',
+          paragraphs: [
+            '你喊出了名字，却无法说出她曾经的愿望。黑色藤蔓向你伸来，彭特先生说过的警告在水声里重新响起：只说“怪物”是不够的。',
+          ],
+          choices: [
+            makeChoice('back', '回到循环，继续寻找古语和愿望。', 'loop_end'),
+            makeChoice('fight', '留下来战斗。', 'ending_dam'),
+          ],
+        }),
+
+        veris_rest: () => ({
+          kicker: '菲奥雷水域 · 安息',
+          title: '保护，而不是控制',
+          paragraphs: [
+            '你清了清嗓，把姓名、愿望和古语放在同一句话里：',
+            { text: '“维丽丝，你曾想保护自己的城市；我以曾经行动的双手、曾经渴望的心，以及被黑暗贪欲蒙蔽的感官，将你驱逐并让你安息。”', className: 'quote' },
+            '维丽丝短暂恢复成人类女人的模样，眼睛变成深棕色，黑色泪水从眼眶流出。随后她化为尘土，散落在湖水上。',
+          ],
+          choices: [
+            makeChoice('south', '带着这份安静，继续南行。', 'heal_south', () => {
+              state.flags.verisRest = true;
+              addKnowledge('verisName');
+              addKnowledge('verisWater');
+            }),
+          ],
+        }),
+
+        heal_south: (s) => ({
+          kicker: '南方干渴的土地',
+          title: '把遗物放进泥土',
+          paragraphs: [
+            '维丽丝消失后，土地终于有了恢复的可能。你把从档案馆带来的遗物带到最干的田地。',
+            { text: '石头带来坚固，火带来生命，冰带来变化；让土地吸收这些力量。', className: 'quote' },
+            ...sceneDetail('heal_south'),
+          ],
+          choices: s.flags.healingRelic && s.flags.verisRest
+            ? [
+              makeChoice('heal', '把遗物放在干渴的土地上，开始施法。', 'south_growth', () => {
+                state.flags.southHealed = true;
+              }),
+              makeChoice('back', '先回到循环，保留这个方法。', 'loop_end'),
+            ]
+            : [
+              makeChoice('wait', '没有遗物，先留在南方生活。', 'ending_south_only'),
+              makeChoice('back', '回到循环，去历史路线寻找治愈遗物。', 'loop_end'),
+            ],
+        }),
+
+        south_growth: () => ({
+          kicker: '南方 · 几年以后',
+          title: '土地重新呼吸',
+          paragraphs: [
+            '遗物像玻璃一样碎裂，光芒进入泥土。第二天，苔藓、杂草、新叶和幼苗从田地里冒出来。几年后，橙子和橄榄重新丰收，鱼群回到河流，芥末花在山坡上重新开放。',
+            '南方的城镇重新繁荣。由饥荒引发的政变与战争没有发生。',
+          ],
+          choices: [
+            makeChoice('stay', '留在南方。', 'ending_south_only'),
+            makeChoice('wait', '继续等待几年，再回到埃莱亚。', 'return_elaia'),
+          ],
+        }),
+
+        return_elaia: (s) => ({
+          kicker: '回到埃莱亚',
+          title: '从小门进入城市',
+          paragraphs: s.flags.gem
+            ? [
+              '你带着凤凰宝石潜回埃莱亚。城门已经无法正常使用，你只能从小门进入。乔的高塔仍然立在城市上方，像一根指向天空的针。',
+              '你把凤凰宝石带进塔内的法阵，等待彗星出现。',
+            ]
+            : [
+              '南方已经复苏，但你回到埃莱亚时才发现自己没有凤凰宝石。乔的高塔在等待，天空中的彗星也在等待。',
+            ],
+          choices: s.flags.gem
+            ? [makeChoice('tower', '进入乔的高塔。', 'tower')]
+            : [
+              makeChoice('south', '回到南方，守住已经复苏的土地。', 'ending_south_only'),
+              makeChoice('risk', '没有宝石也闯进高塔。', 'ending_unchanged'),
+            ],
+        }),
+
+        tower: (s) => ({
+          kicker: '乔的高塔 · 彗星将至',
+          title: '凤凰宝石真正要做的事',
+          paragraphs: [
+            '凤凰宝石的力量流入城市。你终于明白，它不是为了摧毁敌人而存在，而是为了保护这座城市，即使一次次燃尽自己也愿意。',
+            s.flags.protectWord
+              ? { text: '你已经知道古语的正确方向：保护。', className: 'detail' }
+              : { text: '你还没有学会那句关键古语。', className: 'detail' },
+          ],
+          choices: [
+            makeChoice(
+              'protect',
+              s.flags.protectWord ? '低声说出“保护”的古语。' : '尝试说出“保护”（但你还不会读古语）。',
+              s.flags.protectWord ? 'final_loop' : 'ending_unchanged',
+              () => { if (state.flags.protectWord) state.flags.cometProtected = true; },
+            ),
+            makeChoice('destroy', '使用“毁灭”或苏泽特的力量词。', 'ending_gem'),
+            makeChoice('nothing', '什么也不做。', 'ending_impact'),
+          ],
+        }),
+
+        final_loop: () => ({
+          kicker: '彗星消失之后',
+          title: '最后一块循环石',
+          paragraphs: [
+            '古语在胸腔里回响，凤凰宝石爆发出强光。你抬起头时，城市仍然站立，天空已经恢复清澈。',
+            '一块新的发光石头在你手中生成。循环仍然可以重新开始。',
+          ],
+          choices: [
+            makeChoice('drop', '放下石头，选择留下。', 'true_ending'),
+            makeChoice('hold', '握住石头，回到大学宿舍。', null, null, { special: 'newLoop' }),
+          ],
+        }),
+
+        true_ending: () => ({
+          kicker: '终点',
+          title: '真正属于你的普通人生',
+          paragraphs: [
+            '北方不再枯萎，南方重新繁荣。你把南方当作家，在海边城镇生活到老。',
+            '晚年时，你坐在面向大海的广场上，给孩子们讲过去的故事：黑暗与魔法、被愿望吞噬的女人、从未发生的战争、带着毒素的橙子、爱情、失去和善意。',
+            '你没有成为神，也没有永远年轻，只是终于拥有了一段真正属于自己的普通人生。最后，你在海风、孩子的笑声和城镇的声音中安静闭眼。',
+          ],
+          choices: [
+            makeChoice('theme', '读一读这段故事真正想说的话。', 'theme'),
+            makeChoice('again', '从新的清晨开始。', null, null, { special: 'newLoop' }),
+          ],
+        }),
+
+        theme: () => ({
+          kicker: '主题',
+          title: '保护与控制的区别',
+          paragraphs: [
+            '这部故事表面上讲的是彗星、魔法和时间循环，核心其实是“保护”与“控制”的区别。',
+            '乔用一次次循环控制灾难，却逐渐疲惫；苏泽特试图用许愿魔法控制世界，最后被愿望反噬；古代人为了保护城市，淹没了菲奥雷，也把问题封在地下；埃莱亚想保护自己，却任由南方在饥荒中走向战争。',
+            '主人公最终选择的不是消灭一切威胁，而是分别修复人、土地、城市和记忆之间的关系。真结局的关键不是更强的魔法，而是理解“保护”这个词真正意味着什么。',
+          ],
+          choices: [
+            makeChoice('back', '回到尾声。', 'true_ending'),
+            makeChoice('again', '回到新的清晨。', null, null, { special: 'newLoop' }),
+          ],
+        }),
+
+        ending_unchanged: () => ({
+          kicker: '结局 A · 什么都没有改变',
+          title: '彗星落下',
+          paragraphs: [
+            '你没有获得足够的知识，也没有找到能保护城市的力量。彗星穿过天空，世界在白光中结束。',
+            '下一次睁眼时，你仍然会回到宿舍清晨。',
+          ],
+          choices: [
+            makeChoice('again', '保留这次记忆，开始下一轮。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+
+        ending_war: () => ({
+          kicker: '结局 B · 战争人生',
+          title: '南方的火线',
+          paragraphs: [
+            '南方歉收引发政变，战争爆发。你在医疗帐篷、前线、城墙和档案馆之间来回奔走，许多角色受伤或死亡。埃莱亚也许守住了城门，却没有解决水和土地正在死去的原因。',
+          ],
+          choices: [
+            makeChoice('again', '带着战争的记忆回到下一轮。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+
+        ending_suzette: () => ({
+          kicker: '结局 C · 苏泽特舞会灾难',
+          title: '红花吞没大厅',
+          paragraphs: [
+            '苏泽特重建了许愿魔法。黑色藤蔓和红色花朵从她的愿望里长出来，吞没舞会。彭特先生只看见怪物的表象，却不知道完整的姓名与愿望，咒语因此失败。',
+            '你又一次明白：愿望脱离理解和责任，就会变成吞噬自己的力量。',
+          ],
+          choices: [
+            makeChoice('again', '回到下一轮，先处理那些资料。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+
+        ending_dam: () => ({
+          kicker: '结局 D · 炸坝与菲奥雷',
+          title: '洪水之后',
+          paragraphs: [
+            '水坝崩塌，洪水冲向下游，湖底城市显露。你看见菲奥雷的遗迹和维丽丝的黑水，却也看见洪水造成的巨大现实灾难。',
+            '这条路线带来了知识，也带来了无法轻易挽回的代价。',
+          ],
+          choices: [
+            makeChoice('again', '回到下一轮，换一种方式调查。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+
+        ending_gem: () => ({
+          kicker: '结局 E · 凤凰宝石的错误使用',
+          title: '毁灭不是保护',
+          paragraphs: [
+            '你用“毁灭”一类的力量词回应彗星。彗星被打碎成燃烧的碎片，埃莱亚也在碎片中被摧毁。',
+            '消灭威胁，并不等于保护城市。',
+          ],
+          choices: [
+            makeChoice('again', '回到下一轮，记住真正的词。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+
+        ending_impact: () => ({
+          kicker: '结局 A · 什么也不做',
+          title: '撞击',
+          paragraphs: [
+            '你什么也没有做。彗星撞上埃莱亚，城市和高塔一起沉入白光。循环把你带回宿舍，答案仍然没有改变。',
+          ],
+          choices: [
+            makeChoice('again', '回到下一轮。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+
+        ending_south_only: () => ({
+          kicker: '结局 F · 只治愈南方',
+          title: '南方的和平',
+          paragraphs: [
+            '南方的土地恢复，战争没有发生。你在海边或农场找到了一段和平生活，却没有赶回高塔。彗星仍然是尚未解决的末日威胁。',
+          ],
+          choices: [
+            makeChoice('again', '回到下一轮，继续寻找完整答案。', null, null, { special: 'newLoop' }),
+            makeChoice('guide', '查看推荐的真结局流程。', 'guide'),
+          ],
+        }),
+      };
+
+      function getScene(id) {
+        if (id.startsWith('ending_')) {
+          addKnowledge('loopStone');
+          addKnowledge('comet');
+        }
+        return scenes[id] ? scenes[id](state) : scenes.ending_unchanged(state);
+      }
+
+      function appendScene(id, choiceLabel) {
+        const definition = getScene(id);
+        const paragraphs = definition.paragraphs || [];
+        const needle = normalize(choiceLabel);
+        const echoIndex = choiceLabel
+          ? paragraphs.findIndex((paragraph) => normalize(textOf(paragraph)).includes(needle))
+          : -1;
+        if (choiceLabel && echoIndex < 0) {
+          state.transcript.push({ text: choiceLabel, className: 'choice-record' });
+        }
+        paragraphs.forEach((paragraph, index) => {
+          const item = typeof paragraph === 'string' ? { text: paragraph } : { ...paragraph };
+          if (index === echoIndex) {
+            item.className = [item.className, 'choice-record'].filter(Boolean).join(' ');
+          }
+          state.transcript.push(item);
+        });
+      }
+
+      function renderParagraphs() {
+        storyCopy.replaceChildren(...state.transcript.map((item) => {
+          const paragraph = document.createElement('p');
+          paragraph.textContent = textOf(item);
+          if (item.className) paragraph.className = item.className;
+          return paragraph;
+        }));
+      }
+
+      function renderChoices(definition) {
+        choices.replaceChildren(...(definition.choices || []).map((choice) => {
+          const button = document.createElement('button');
+          button.className = 'choice';
+          button.type = 'button';
+          button.dataset.choice = choice.id;
+          button.textContent = choice.label;
+          if (choice.disabled) button.disabled = true;
+          return button;
+        }));
+      }
+
+      function renderScene() {
+        const definition = getScene(state.scene);
+        wakeView.hidden = state.scene !== 'wake';
+        sceneView.hidden = state.scene === 'wake';
+        chapterLabel.textContent = 'INK';
+        wakeTitle.textContent = state.loop ? '再次醒来' : '醒来';
+        wakeHint.textContent = state.loop ? `第 ${state.loop + 1} 轮 · 记忆仍在。` : '每一轮都会从这里开始。';
+        if (state.scene === 'wake') return;
+        sceneKicker.textContent = definition.kicker || '';
+        sceneKicker.hidden = !definition.kicker;
+        sceneTitle.textContent = definition.title || '';
+        sceneTitle.hidden = !definition.title;
+        renderParagraphs();
+        renderChoices(definition);
+        window.setTimeout(() => choices.querySelector('.choice')?.focus(), 70);
+      }
+
+      function transition(next, choiceLabel) {
+        const target = typeof next === 'function' ? next(state) : next;
+        if (!target || !scenes[target]) return;
+        state.scene = target;
+        appendScene(target, choiceLabel);
+        state.detail = null;
+        renderScene();
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+
+      function startLoop() {
+        const persistentFlagKeys = ['ancientTongue', 'protectWord', 'verisName', 'verisWish'];
+        const preservedFlags = Object.fromEntries(
+          persistentFlagKeys.map((key) => [key, Boolean(state.flags[key])]),
+        );
+        const preservedKnowledge = [...state.knowledge];
+        const nextLoop = state.loop + 1;
+        Object.assign(state, createInitialState(), {
+          loop: nextLoop,
+          flags: {
+            ...createInitialState().flags,
+            ...preservedFlags,
+            southernClue: preservedKnowledge.includes('southernClue'),
+          },
+          knowledge: preservedKnowledge,
+        });
+        renderScene();
+        wakeButton.focus();
+        setStatus(`第 ${nextLoop + 1} 轮开始`);
+      }
+
+      function choose(id) {
+        const definition = getScene(state.scene);
+        const choice = (definition.choices || []).find((item) => item.id === id);
+        if (!choice || choice.disabled) return;
+        if (choice.special === 'newLoop') {
+          startLoop();
+          return;
+        }
+        if (choice.action) choice.action(state);
+        transition(choice.next, choice.label);
+      }
+
+      function goToStory() {
+        transition('story');
+      }
+
+      function restart() {
+        Object.assign(state, createInitialState());
+        renderScene();
+        wakeButton.focus();
+        setStatus('已重来');
+      }
+
+      function setStatus(message) {
+        status.textContent = message;
+        window.clearTimeout(setStatus.timer);
+        setStatus.timer = window.setTimeout(() => { status.textContent = ''; }, 2200);
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          setStatus('已保存当前进度');
+        } catch (error) {
+          setStatus('浏览器不允许保存');
+        }
+      }
+
+      function load() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+          if (!saved || !scenes[saved.scene]) {
+            setStatus('还没有可读取的记录');
+            return;
+          }
+          const fresh = createInitialState();
+          Object.assign(state, fresh, saved);
+          state.flags = { ...fresh.flags, ...(saved.flags || {}) };
+          state.knowledge = Array.isArray(saved.knowledge) ? saved.knowledge.filter((id) => clueCatalog.some(([key]) => key === id)) : [];
+          state.transcript = Array.isArray(saved.transcript) ? saved.transcript.filter((item) => item && typeof item.text === 'string') : [];
+          if (!Number.isInteger(state.loop) || state.loop < 0) state.loop = 0;
+          renderScene();
+          setStatus('已读取记录');
+        } catch (error) {
+          setStatus('读取记录失败');
+        }
+      }
+
+      function renderClues() {
+        clueMeta.textContent = `第 ${state.loop + 1} 轮 · 已发现 ${state.knowledge.length} / ${clueCatalog.length} 条线索`;
+        clueList.replaceChildren(...clueCatalog.map(([id, text]) => {
+          const item = document.createElement('li');
+          item.className = `clue-item${state.knowledge.includes(id) ? ' known' : ''}`;
+          item.textContent = text;
+          return item;
+        }));
+      }
+
+      function toggleClues(open) {
+        const visible = typeof open === 'boolean' ? open : cluePanel.hidden;
+        cluePanel.hidden = !visible;
+        if (visible) {
+          renderClues();
+          document.getElementById('clueClose').focus();
+        }
+      }
+
+      wakeButton.addEventListener('click', goToStory);
+      choices.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-choice]');
+        if (button) choose(button.dataset.choice);
+      });
+      document.getElementById('restartButton').addEventListener('click', restart);
+      document.getElementById('saveButton').addEventListener('click', save);
+      document.getElementById('loadButton').addEventListener('click', load);
+      document.getElementById('clueButton').addEventListener('click', () => toggleClues(true));
+      document.getElementById('clueClose').addEventListener('click', () => toggleClues(false));
+      cluePanel.addEventListener('click', (event) => {
+        if (event.target === cluePanel) toggleClues(false);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          if (!cluePanel.hidden) toggleClues(false);
+          else restart();
+        }
+        if (state.scene === 'wake' && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          goToStory();
+        }
+      });
+
+      renderScene();
+    })();
+  </script>
+</body>
+</html>
