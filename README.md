@@ -17,6 +17,7 @@
 ```text
 stay/
 ├── index.html          # 游戏本体（单文件模式）
+├── cover-800x450.png   # 800×450 游戏封面
 ├── star-letter.json    # 星匣工程清单
 ├── star-letter.mock.ts # 本地模拟入口
 └── README.md
