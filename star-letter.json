@@ -6,8 +6,12 @@
     "互动叙事",
     "短篇文字游戏"
   ],
-  "gameCategory": [],
+  "gameCategory": [
+    10001,
+    10002
+  ],
   "summary": "《Stay?》中文可玩适配版：从开场选择出发，探索三条主线、循环线索与多种结局。",
+  "cover": "./cover.svg",
   "gameFile": "./index.html",
   "gameType": 0,
   "screen": 0,
